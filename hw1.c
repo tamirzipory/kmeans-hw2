@@ -4,22 +4,26 @@
 #define MAX_FILE_NAME 100
 int main(void)
 {
-    FILE *fp, *fp2;
+    FILE *fp;
     int count = 0;
     int dim = 1;
     char filename[MAX_FILE_NAME];
+    double *matrix;
+    double *row;
+    double *all;
+    double point;
+    char ch;
     char c;
     char w;
     printf("Enter file name: \n");
     scanf("%s", filename);
     fp = fopen(filename, "r");
-    fp2 = fopen(filename, "r");
     assert(fp!=NULL);
 
-    for (c = getc(fp); c != EOF; c = getc(fp)){
+    for (c = getc(fp); c != EOF; c = getc(fp))
+    {
         if(c == '\n')
-            count+=1;
-        
+            count+=1;   
     }
         
     rewind(fp);    
@@ -27,49 +31,77 @@ int main(void)
         if(w == ',')
            dim+=1;
     }
-  rewind(fp);
-    int i, j;
-    double *matrix;
-    double **cell;
-    double point;
-    char ch;
-    matrix = (double *) calloc(count*dim, sizeof(double));
 
-    cell = (double **)calloc(dim, sizeof(double));
+    int i, j;
+    rewind(fp); 
+
+    all = (double *) calloc(count*dim, sizeof(double));
+    matrix = (double *) calloc(count*dim, sizeof(double)); // this is the matrix - every element point to arr of nums
+
+    row = (double *)calloc(dim, sizeof(double)); // the arr that save cluster
 
     for(int i = 0; i < dim; i++)
     {
-        cell[i] = matrix+i*dim;
-   
+        row[i] = i*dim; // initialize 
     }
 
  i = 0, j = 0;
 
     while(fscanf(fp, "%lf%c", &point, &ch)!=EOF)
-    {
-    
-        if(j == dim-1){
-            matrix[i] = **cell;
-            
+    {  
+        if(j == dim-1)
+        {    
+            matrix[i] = *row;
             i++;
             j = 0;
         }
-        
-        else{
-            cell[j] = &point;
+        else
+        {
+            row[j] = point;
             j++;
         }
     }
+    i = 0;
+    rewind(fp);
+    while(fscanf(fp, "%lf%c", &point, &ch)!=EOF)
+    {  
+       all[j] = point;
+       j++;
+    }
+    /*
 
    for(int i = 0; i < count; i++)
    {
-       for(int j = 0; j < dim; j++){
+       for(int j = 0; j < dim; j++)
+       {
            printf("%.4f ,", matrix[i]);
        }
-       printf("end of \n");
+       printf("end of line \n");
    }
-
+*/
    fclose(fp);
-   fclose(fp2);
    printf("The file %s has %d lines and %d dim\n ", filename, count, dim);
+/*
+     for(int i = 0; i < count*dim; i++)
+   {
+           
+           printf("%.4f ,", all[i]);
+       
+   }
+*/
+double * my_mat = (double *) malloc(dim*count * sizeof(double *));
+for(int index = 0; index < dim *count; index++)
+{
+    my_mat[index] = all[index];
+}
+printf("here\n");
+for(int i = 0; i < count; i++)
+{
+    for(int j = 0; j < dim; j++)
+    {
+        printf("%.4f ,", my_mat[i*dim+j]);
+    }
+       printf("\n");
+}
+
 }
